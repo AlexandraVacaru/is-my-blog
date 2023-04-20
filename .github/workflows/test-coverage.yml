@@ -32,8 +32,14 @@ jobs:
           name: coverage-report
           path: target/site/jacoco/index.html
 
-      - name: Comment on pull request with test coverage
-        uses: mikepenz/action-jacoco-comment@v2
+      - name: Generate coverage report tables
+        uses: Mikepenz/jacoco-report-tables@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          report_path: target/site/jacoco/index.html
+          classfiles: '**/target/classes'
+          sources: '**/src/main/java'
+          reportPath: '**/target/site/jacoco/jacoco.xml'
+          minClassCoverage: 0
+          minMethodCoverage: 0
+          minLineCoverage: 0
+          minBranchCoverage: 0
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
