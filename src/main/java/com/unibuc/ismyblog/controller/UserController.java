@@ -55,6 +55,14 @@ public class UserController {
         return "redirect:/welcome";
     }
 
+    @GetMapping("/login")
+    public String showLoginForm() {
+        if(securityService.isAuthenticated()) {
+            return "redirect:/index";
+        }
+        return "login";
+    }
+
     @GetMapping({"/", "/index"})
     public ModelAndView welcome(){
         ModelAndView modelAndView = new ModelAndView("welcome");
