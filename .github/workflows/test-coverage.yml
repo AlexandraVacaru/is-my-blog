@@ -31,3 +31,9 @@ jobs:
         with:
           name: coverage-report
           path: target/site/jacoco/index.html
+
+      - name: Comment on pull request with test coverage
+        uses: mikepenz/action-jacoco-comment@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          report_path: target/site/jacoco/index.html
