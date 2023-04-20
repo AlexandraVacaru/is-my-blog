@@ -1,10 +1,7 @@
 name: JaCoCo Test Coverage
 
 on:
-  push:
-    branches: [ develop ]
   pull_request:
-    branches: [ develop ]
 
 jobs:
   build:
@@ -25,6 +22,12 @@ jobs:
 
       - name: Generate JaCoCo report
         run: mvn jacoco:report
+
+      - name: Upload Report
+        uses: 'actions/upload-artifact@v2'
+        with:
+          name: report.xml
+          path: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
 
       - name: JaCoCo Report
         id: jacoco
