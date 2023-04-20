@@ -26,16 +26,16 @@ jobs:
       - name: Generate JaCoCo report
         run: mvn jacoco:report
 
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v2
-        with:
-          name: coverage-report
-          path: target/site/jacoco/index.html
-
-      - name: Generate coverage report tables
-        uses: madrapps/jacoco-report@v1.3
+      - name: JaCoCo Report
+        id: jacoco
+        uses: Madrapps/jacoco-report@v1.3
         with:
           paths: ${{ github.workspace }}/build/reports/jacoco/testCoverage/testCoverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 40
           min-coverage-changed-files: 60
+
+      - name: Get the Coverage info
+        run: |
+          echo "Total coverage ${{ steps.jacoco.outputs.coverage-overall }}"
+          echo "Changed Files coverage ${{ steps.jacoco.outputs.coverage-changed-files }}"
