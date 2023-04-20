@@ -33,7 +33,7 @@ jobs:
           path: target/site/jacoco/index.html
 
       - name: Generate coverage report tables
-        uses: Mikepenz/jacoco-report-tables@v3
+        uses: madrapps/jacoco-report@v1.3
         with:
           classfiles: '**/target/classes'
           sources: '**/src/main/java'
