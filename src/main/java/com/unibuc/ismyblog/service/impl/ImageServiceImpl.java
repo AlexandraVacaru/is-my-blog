@@ -1,0 +1,55 @@
+package com.unibuc.ismyblog.service.impl;
+
+import com.unibuc.ismyblog.exception.NotFoundException;
+import com.unibuc.ismyblog.model.Blog;
+import com.unibuc.ismyblog.model.Picture;
+import com.unibuc.ismyblog.repository.BlogRepository;
+import com.unibuc.ismyblog.repository.PictureRepository;
+import com.unibuc.ismyblog.service.ImageService;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.transaction.Transactional;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@AllArgsConstructor
+public class ImageServiceImpl implements ImageService {
+
+    private final BlogRepository blogRepository;
+    private final PictureRepository pictureRepository;
+    @Override
+    @Transactional
+    public void saveImageFile(Long blogId, MultipartFile[] images) throws IOException {
+        Optional<Blog> blog = blogRepository.findById(blogId);
+
+        if(blog.isPresent()) {
+            List<Picture> pictures = blog.get().getPictures();
+
+            if(pictures == null || pictures.size() == 0) {
+                pictures = new ArrayList<>();
+            }
+
+            for (MultipartFile file: images) {
+                Byte[] byteObjects = new Byte[file.getBytes().length];
+                int i = 0; for (byte b : file.getBytes()){
+                    byteObjects[i++] = b; }
+
+                Picture picture = new Picture();
+                picture.setPicture(byteObjects);
+                picture.setBlog(blog.get());
+                Picture savedPicture = pictureRepository.save(picture);
+                pictures.add(savedPicture);
+                blog.get().setPictures(pictures);
+                blogRepository.save(blog.get());
+            }
+
+        } else {
+            throw new NotFoundException("Blog with blogId " + blogId + " not found");
+        }
+    }
+}
