@@ -1,6 +1,8 @@
 package com.unibuc.ismyblog.controller;
 
+import com.unibuc.ismyblog.model.Blog;
 import com.unibuc.ismyblog.model.User;
+import com.unibuc.ismyblog.service.BlogService;
 import com.unibuc.ismyblog.service.RoleService;
 import com.unibuc.ismyblog.service.UserService;
 import lombok.AllArgsConstructor;
@@ -23,6 +25,7 @@ public class AdminController {
 
     private final UserService userService;
     private final RoleService roleService;
+    private final BlogService blogService;
 
     @GetMapping("/user/list")
     public ModelAndView usersList(@RequestParam("page") Optional<Integer> page,
@@ -32,6 +35,17 @@ public class AdminController {
         ModelAndView modelAndView = new ModelAndView("users");
         Page<User> userPage = userService.findPaginated(PageRequest.of(currentPage - 1, pageSize));
         modelAndView.addObject("userPage", userPage);
+        return modelAndView;
+    }
+
+    @GetMapping( "/admin/blog/list")
+    public ModelAndView blogsList(@RequestParam("page") Optional<Integer> page,
+                                  @RequestParam("size") Optional<Integer> size){
+        int currentPage = page.orElse(1);
+        int pageSize = size.orElse(2);
+        ModelAndView modelAndView = new ModelAndView("admin-blogs");
+        Page<Blog> blogPage = blogService.findPaginated(PageRequest.of(currentPage - 1, pageSize));
+        modelAndView.addObject("blogPage", blogPage);
         return modelAndView;
     }
 
