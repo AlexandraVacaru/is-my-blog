@@ -6,4 +6,5 @@ public interface BlogService {
 
     Blog save(Blog blog);
 
+    Object findById(Long blogId);
 }

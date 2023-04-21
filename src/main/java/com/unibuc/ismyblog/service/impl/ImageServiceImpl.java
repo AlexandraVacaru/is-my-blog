@@ -52,4 +52,9 @@ public class ImageServiceImpl implements ImageService {
             throw new NotFoundException("Blog with blogId " + blogId + " not found");
         }
     }
+
+    @Override
+    public Optional<Picture> findById(Long id) {
+        return pictureRepository.findById(id);
+    }
 }

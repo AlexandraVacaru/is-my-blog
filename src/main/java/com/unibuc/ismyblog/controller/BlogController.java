@@ -10,10 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
@@ -52,5 +49,11 @@ public class BlogController {
         log.info("Successfully added blog with id {} by user {}", savedBlog.getBlogId(),
                 savedBlog.getUser().getUsername());
         return "redirect:/blog/list" ;
+    }
+
+    @GetMapping("/blog/{blogId}")
+    public String showById(@PathVariable("blogId") Long blogId, Model model){
+        model.addAttribute("blog", blogService.findById(blogId));
+        return "blog";
     }
 }
