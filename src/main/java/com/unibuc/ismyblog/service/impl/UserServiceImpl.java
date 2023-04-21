@@ -1,6 +1,7 @@
 package com.unibuc.ismyblog.service.impl;
 
 import com.unibuc.ismyblog.exception.NotFoundException;
+import com.unibuc.ismyblog.model.Blog;
 import com.unibuc.ismyblog.model.Role;
 import com.unibuc.ismyblog.model.RoleEnum;
 import com.unibuc.ismyblog.model.User;
@@ -8,11 +9,15 @@ import com.unibuc.ismyblog.repository.RoleRepository;
 import com.unibuc.ismyblog.repository.UserRepository;
 import com.unibuc.ismyblog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -71,5 +76,30 @@ public class UserServiceImpl implements UserService {
         return userOptional.get();
     }
 
+    @Override
+    public Page<User> findPaginated(Pageable pageable) {
+        return userRepository.findAll(pageable);
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(Long userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if(userOptional.isEmpty()) {
+            throw new NotFoundException("User with userId: " +  userId + "not found");
+        }
+        User user = userOptional.get();
+        Set<Role> roles = new LinkedHashSet<>();
+        Set<Blog> likedBlogs = new LinkedHashSet<>();
+        user.getRoles().iterator().forEachRemaining(roles::add);
+
+        for(Role role : roles) {
+            user.removeRole(role);
+        }
+
+
+        userRepository.save(user);
+        userRepository.deleteById(userId);
+    }
 
 }

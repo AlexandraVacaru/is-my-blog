@@ -64,4 +64,9 @@ public class User {
     @JoinColumn(name = "contact_info_id")
     @ToString.Exclude
     private ContactInfo contactInfo;
+
+    public void removeRole(Role role) {
+        role.getUsers().remove(this);
+        roles.remove(role);
+    }
 }
