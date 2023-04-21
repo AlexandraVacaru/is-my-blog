@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql(scripts = "schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@ActiveProfiles("h2")
 @Slf4j
 public class BlogRepositoryTest {
 
