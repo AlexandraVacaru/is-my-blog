@@ -121,4 +121,54 @@ public class BlogServiceImplTest {
         verify(blogRepository, times(1)).deleteById(blog.getBlogId());
 
     }
+
+    @Test
+    void findPaginatedWelcome(){
+        Blog blog1 = Blog.builder()
+                .blogId(1L)
+                .category(CategoryEnum.OTHER)
+                .title("Blog1")
+                .pictures(new ArrayList<>())
+                .build();
+        Blog blog2 = Blog.builder()
+                .blogId(2L)
+                .category(CategoryEnum.OTHER)
+                .pictures(new ArrayList<>())
+                .title("Blog2")
+                .build();
+
+        List<Blog> blogs = List.of(blog1, blog2);
+
+        when(blogRepository.findAll()).thenReturn(blogs);
+
+        Page<Blog> result = blogService.findPaginatedWelcome(PageRequest.of(0, 4));
+        assertEquals(2, result.getNumberOfElements());
+        assertEquals("Blog1", result.getContent().get(0).getTitle());
+        assertEquals("Blog2", result.getContent().get(1).getTitle());
+
+    }
+
+    @Test
+    void findAll() {
+        Blog blog1 = Blog.builder()
+                .blogId(1L)
+                .category(CategoryEnum.OTHER)
+                .title("Blog1")
+                .pictures(new ArrayList<>())
+                .build();
+        Blog blog2 = Blog.builder()
+                .blogId(2L)
+                .category(CategoryEnum.OTHER)
+                .pictures(new ArrayList<>())
+                .title("Blog2")
+                .build();
+
+        List<Blog> blogs = List.of(blog1, blog2);
+
+        when(blogRepository.findAll()).thenReturn(blogs);
+
+        List<Blog> result = blogService.findAll();
+        assertEquals(2, result.size());
+        verify(blogRepository, times(1)).findAll();
+    }
 }

@@ -8,12 +8,12 @@ import com.unibuc.ismyblog.service.BlogService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service("blogService")
 @AllArgsConstructor
@@ -41,6 +41,30 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public Page<Blog> findPaginated(Pageable pageable) {
         return blogRepository.findAll(pageable);
+    }
+
+    @Override
+    public List<Blog> findAll() {
+        List<Blog> blogs = new LinkedList<>();
+        blogRepository.findAll().iterator().forEachRemaining(blogs::add);
+        return blogs;
+    }
+    @Override
+    public Page<Blog> findPaginatedWelcome(Pageable pageable) {
+        List<Blog> blogs = findAll();
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<Blog> list;
+        if (blogs.size() < startItem) {
+            list = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, blogs.size());
+            list = blogs.subList(startItem, toIndex);
+        }
+        Page<Blog> blogPage = new PageImpl<>(list, PageRequest.of(currentPage,
+                pageSize), blogs.size());
+        return blogPage;
     }
 
     @Override

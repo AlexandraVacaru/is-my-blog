@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -21,7 +24,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -167,5 +172,41 @@ public class BlogControllerTest {
         mockMvc.perform(get("/blog/delete/{blog_id}", "2")
                         .param("username", "user_1"))
                 .andExpect(redirectedUrl("/blog/list"));
+    }
+
+    @Test
+    @WithMockUser(username = "user_1", password = "user", roles = "USER")
+    public void blogsList() throws Exception {
+        Blog blog1 = Blog.builder()
+                .blogId(1L)
+                .category(CategoryEnum.OTHER)
+                .title("Blog1")
+                .pictures(new ArrayList<>())
+                .build();
+        Blog blog2 = Blog.builder()
+                .blogId(2L)
+                .category(CategoryEnum.OTHER)
+                .pictures(new ArrayList<>())
+                .title("Blog2")
+                .build();
+        User user = User.builder()
+                .userId(1L)
+                .email("email@yahoo.com")
+                .password("12345")
+                .birthDate(LocalDate.of(2020, 10, 10))
+                .build();
+
+        List<Blog> blogs = List.of(blog1, blog2);
+
+        Page<Blog> blogPage = new PageImpl<>(blogs, PageRequest.of(1,
+                4), blogs.size());
+
+        when(blogService.findPaginatedWelcome(any())).thenReturn(blogPage);
+        when(userService.getAuthenticatedUser()).thenReturn(user);
+
+        mockMvc.perform(get("/blog/list"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(view().name("welcome"))
+                .andExpect(model().attribute("blogPage", blogPage));
     }
 }

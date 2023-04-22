@@ -7,12 +7,15 @@ import com.unibuc.ismyblog.service.ImageService;
 import com.unibuc.ismyblog.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -57,6 +60,19 @@ public class BlogController {
     public String showById(@PathVariable("blogId") Long blogId, Model model){
         model.addAttribute("blog", blogService.findById(blogId));
         return "blog";
+    }
+
+    @GetMapping({"/", "/index", "/blog/list"})
+    public ModelAndView blogsList(@RequestParam("page") Optional<Integer> page,
+                                  @RequestParam("size") Optional<Integer> size){
+        int currentPage = page.orElse(1);
+        int pageSize = size.orElse(4);
+        ModelAndView modelAndView = new ModelAndView("welcome");
+        modelAndView.addObject("authenticatedUser", userService.getAuthenticatedUser());
+        Page<Blog> blogPage = blogService.findPaginatedWelcome(PageRequest.of(currentPage - 1, pageSize));
+        modelAndView.addObject("blogPage", blogPage);
+        modelAndView.addObject("blogSorted", false);
+        return modelAndView;
     }
 
     @PreAuthorize("#username == authentication.principal.username or hasRole('ROLE_ADMIN')")
