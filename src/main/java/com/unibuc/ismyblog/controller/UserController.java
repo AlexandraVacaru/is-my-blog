@@ -63,10 +63,4 @@ public class UserController {
         return "login";
     }
 
-    @GetMapping({"/", "/index"})
-    public ModelAndView welcome(){
-        ModelAndView modelAndView = new ModelAndView("welcome");
-        modelAndView.addObject("authenticatedUser", userService.getAuthenticatedUser());
-        return modelAndView;
-    }
 }

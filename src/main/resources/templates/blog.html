@@ -137,12 +137,12 @@
                   <div class="post-options">
                     <div class="row">
 
-                      <div class="col-6" th:if=" ${blog.user != null} and ${#authentication.getName()} != ${blog.user.username} and ${@blogService.isLiked(blog.blogId, #authentication.getName())} == false">
-                        <ul class="post-tags" >
-                          <li><i class="fa fa-heart"></i></li>
-                          <li><a th:href="@{/like/{blogId}/user/{username}(blogId=${blog.blogId},username=${#authentication.getName()})}">Like</a></li>
-                        </ul>
-                      </div>
+<!--                      <div class="col-6" th:if=" ${blog.user != null} and ${#authentication.getName()} != ${blog.user.username} and ${@blogService.isLiked(blog.blogId, #authentication.getName())} == false">-->
+<!--                        <ul class="post-tags" >-->
+<!--                          <li><i class="fa fa-heart"></i></li>-->
+<!--                          <li><a th:href="@{/like/{blogId}/user/{username}(blogId=${blog.blogId},username=${#authentication.getName()})}">Like</a></li>-->
+<!--                        </ul>-->
+<!--                      </div>-->
 
                     </div>
                   </div>
