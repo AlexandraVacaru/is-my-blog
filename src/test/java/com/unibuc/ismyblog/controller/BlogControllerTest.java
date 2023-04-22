@@ -150,4 +150,22 @@ public class BlogControllerTest {
                 .andExpect(view().name("blog-form"));
 
     }
+
+    @Test
+    @WithMockUser(username = "user_1", password = "user", roles = "USER")
+    public void deleteByIdIsForbidden() throws Exception {
+
+        mockMvc.perform(get("/blog/delete/{blog_id}", "2")
+                        .param("username", "user_2"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "user_1", password = "user", roles = "USER")
+    public void deleteByIdMockMvc() throws Exception {
+
+        mockMvc.perform(get("/blog/delete/{blog_id}", "2")
+                        .param("username", "user_1"))
+                .andExpect(redirectedUrl("/blog/list"));
+    }
 }

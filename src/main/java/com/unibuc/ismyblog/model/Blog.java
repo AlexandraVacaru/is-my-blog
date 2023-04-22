@@ -10,10 +10,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "blog")
@@ -56,6 +53,14 @@ public class Blog {
     public String getFormattedDate() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return date.format(formatter);
+    }
+
+    public String getFormattedContent() {
+        if (content.length() < 20) {
+            return content;
+        }
+
+        return content.substring(0, 20) + "...";
     }
 
 
