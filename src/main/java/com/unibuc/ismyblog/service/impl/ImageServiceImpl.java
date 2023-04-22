@@ -57,4 +57,15 @@ public class ImageServiceImpl implements ImageService {
     public Optional<Picture> findById(Long id) {
         return pictureRepository.findById(id);
     }
+
+    @Override
+    public void deleteById(Long pictureId) {
+        Optional<Picture> picture = pictureRepository.findById(pictureId);
+        if(picture.isEmpty()) {
+            throw new NotFoundException("Picture not found!");
+        }
+        pictureRepository.deleteById(pictureId);
+    }
+
+
 }

@@ -136,7 +136,24 @@
                   <p th:text="${blog.content}"></p>
                   <div class="post-options">
                     <div class="row">
-
+                        <div class="col-6">
+                          <ul class="post-tags" th:if="${blog.user != null} and ${#authentication.getName()} == ${blog.user.username}">
+                            <li><i class="fa fa-trash"></i></li>
+                            <li><a th:href="@{/blog/delete/{blogId}(blogId=${blog.blogId}, username=${#authentication.getName()})}">Delete</a></li>
+                          </ul>
+                        </div>
+                        <div class="col-6">
+                          <ul class="post-tags" th:if="${blog.user != null} and ${#authentication.getName()} == ${blog.user.username}">
+                            <li><i class="fa fa-edit"></i></li>
+                            <li><a th:href="@{/blog/edit/{blogId}(blogId=${blog.blogId})}">Edit</a></li>
+                          </ul>
+                        </div>
+                        <div class="col-6">
+                          <ul class="post-tags" th:if="${blog.user != null} and ${#authentication.getName()} == ${blog.user.username}">
+                            <li><i class="fa fa-edit"></i></li>
+                            <li><a th:href="@{/blog/editPictures/{blogId}(blogId=${blog.blogId})}">Edit Pictures</a></li>
+                          </ul>
+                        </div>
 <!--                      <div class="col-6" th:if=" ${blog.user != null} and ${#authentication.getName()} != ${blog.user.username} and ${@blogService.isLiked(blog.blogId, #authentication.getName())} == false">-->
 <!--                        <ul class="post-tags" >-->
 <!--                          <li><i class="fa fa-heart"></i></li>-->

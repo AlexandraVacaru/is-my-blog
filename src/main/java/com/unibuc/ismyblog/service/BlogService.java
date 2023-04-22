@@ -11,7 +11,7 @@ public interface BlogService {
 
     Blog save(Blog blog);
 
-    Object findById(Long blogId);
+    Blog findById(Long blogId);
 
     Page<Blog> findPaginated(Pageable pageable);
 
