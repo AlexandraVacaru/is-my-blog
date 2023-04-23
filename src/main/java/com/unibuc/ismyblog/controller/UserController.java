@@ -121,4 +121,11 @@ public class UserController {
 
     }
 
+    @GetMapping("/user/{username}")
+    public ModelAndView getUserByUsername(@PathVariable("username") String username){
+        ModelAndView modelAndView = new ModelAndView("user-profile");
+        modelAndView.addObject("user", userService.findByUsername(username));
+        return modelAndView;
+    }
+
 }
