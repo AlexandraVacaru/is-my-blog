@@ -1,6 +1,8 @@
 package com.unibuc.ismyblog.service.impl;
 
+import com.unibuc.ismyblog.exception.NotFoundException;
 import com.unibuc.ismyblog.model.ContactInfo;
+import com.unibuc.ismyblog.model.User;
 import com.unibuc.ismyblog.repository.ContactInfoRepository;
 import com.unibuc.ismyblog.utils.TestUtils;
 import org.junit.Test;
@@ -36,6 +38,27 @@ public class ContactInfoServiceImplTest {
         ContactInfo newContactInfo = sut.findById(contactInfo.getContactInfoId());
 
         assertEquals(contactInfo, newContactInfo);
+    }
+
+    @Test
+    public void givenAValidContactInfoSavesAndReturnsCi() {
+        ContactInfo contactInfo = TestUtils.validContactInfo();
+
+        when(contactInfoRepository.save(any())).thenReturn(contactInfo);
+
+        ContactInfo savedContactInfo = sut.save(contactInfo);
+
+        assertEquals(contactInfo, savedContactInfo);
+    }
+
+    @Test()
+    public void givenNonExistentIdThrowsNotFound() {
+        when(contactInfoRepository.findById(1L)).thenReturn(Optional.empty());
+
+        NotFoundException result = assertThrows(NotFoundException.class, () -> sut.findById(1L));
+
+        assertNotNull(result);
+        assertEquals("Contact info not found!!", result.getMessage());
     }
 
 }
