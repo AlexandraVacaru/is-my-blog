@@ -201,7 +201,7 @@ public class BlogControllerTest {
         Page<Blog> blogPage = new PageImpl<>(blogs, PageRequest.of(1,
                 4), blogs.size());
 
-        when(blogService.findPaginatedWelcome(any())).thenReturn(blogPage);
+        when(blogService.findPaginated(any())).thenReturn(blogPage);
         when(userService.getAuthenticatedUser()).thenReturn(user);
 
         mockMvc.perform(get("/blog/list"))
