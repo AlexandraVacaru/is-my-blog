@@ -84,7 +84,7 @@ public class User {
     @OneToMany(mappedBy = "user")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ToString.Exclude
-    private List<com.example.proiect.model.Comment> comments = new ArrayList<>();
+    private List<Comment> comments = new ArrayList<>();
 
     public void removeRole(Role role) {
         role.getUsers().remove(this);

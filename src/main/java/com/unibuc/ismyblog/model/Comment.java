@@ -1,7 +1,6 @@
-package com.example.proiect.model;
+package com.unibuc.ismyblog.model;
 
-import com.unibuc.ismyblog.model.Blog;
-import com.unibuc.ismyblog.model.User;
+
 import lombok.*;
 
 import javax.persistence.*;

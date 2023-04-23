@@ -53,7 +53,7 @@ public class Blog {
     @OneToMany(mappedBy = "blog")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ToString.Exclude
-    private List<com.example.proiect.model.Comment> comments = new ArrayList<>();
+    private List<Comment> comments = new ArrayList<>();
 
     @ManyToMany(mappedBy = "likedBlogs", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @ToString.Exclude
