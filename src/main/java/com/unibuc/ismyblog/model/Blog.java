@@ -50,18 +50,23 @@ public class Blog {
     @ToString.Exclude
     private List<Picture> pictures = new ArrayList<>();
 
+    @OneToMany(mappedBy = "blog")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ToString.Exclude
+    private List<com.example.proiect.model.Comment> comments = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "likedBlogs", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ToString.Exclude
+    private Set<User> usersLike = new LinkedHashSet<>();
+
     public String getFormattedDate() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return date.format(formatter);
     }
 
-    public String getFormattedContent() {
-        if (content.length() < 20) {
-            return content;
-        }
-
-        return content.substring(0, 20) + "...";
+    public void removeUser(User user) {
+        user.getLikedBlogs().remove(this);
+        usersLike.remove(user);
     }
-
 
 }

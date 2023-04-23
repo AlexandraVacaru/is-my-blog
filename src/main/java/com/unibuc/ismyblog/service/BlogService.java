@@ -9,15 +9,15 @@ import java.util.List;
 
 public interface BlogService {
 
-    Blog save(Blog blog);
-
-    Blog findById(Long blogId);
-
-    Page<Blog> findPaginated(Pageable pageable);
-
-    void deleteById(Long blogId);
-
     List<Blog> findAll();
+    Blog save(Blog blog);
+    Page<Blog> findPaginated(Pageable pageable);
+    Page<Blog> findPaginatedAndSorted(Pageable pageable);
+    Blog findById(Long blogId);
+    void deleteById(Long blogId);
+    List<Blog> findLastPosted();
+    Page<Blog> findByTitle(String searchInput, Pageable pageable);
 
-    Page<Blog> findPaginatedWelcome(Pageable pageable);
+    Boolean isLiked(Long blogId, String username);
+    Long getNoLikes(Long blogId);
 }

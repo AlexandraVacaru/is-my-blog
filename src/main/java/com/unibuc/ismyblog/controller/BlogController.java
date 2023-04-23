@@ -71,7 +71,7 @@ public class BlogController {
         int pageSize = size.orElse(4);
         ModelAndView modelAndView = new ModelAndView("welcome");
         modelAndView.addObject("authenticatedUser", userService.getAuthenticatedUser());
-        Page<Blog> blogPage = blogService.findPaginatedWelcome(PageRequest.of(currentPage - 1, pageSize));
+        Page<Blog> blogPage = blogService.findPaginated(PageRequest.of(currentPage - 1, pageSize));
         modelAndView.addObject("blogPage", blogPage);
         modelAndView.addObject("blogSorted", false);
         return modelAndView;
