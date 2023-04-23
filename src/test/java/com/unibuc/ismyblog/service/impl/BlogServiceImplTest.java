@@ -141,7 +141,7 @@ public class BlogServiceImplTest {
 
         when(blogRepository.findAll()).thenReturn(blogs);
 
-        Page<Blog> result = blogService.findPaginatedWelcome(PageRequest.of(0, 4));
+        Page<Blog> result = blogService.findPaginated(PageRequest.of(0, 4));
         assertEquals(2, result.getNumberOfElements());
         assertEquals("Blog1", result.getContent().get(0).getTitle());
         assertEquals("Blog2", result.getContent().get(1).getTitle());
