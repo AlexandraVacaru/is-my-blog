@@ -209,4 +209,43 @@ public class BlogControllerTest {
                 .andExpect(view().name("welcome"))
                 .andExpect(model().attribute("blogPage", blogPage));
     }
+
+    @Test
+    @WithMockUser(username = "user_1", password = "user", roles = "USER")
+    void updateBlog() throws Exception {
+        Blog blog = Blog.builder()
+                .blogId(1L)
+                .category(CategoryEnum.OTHER)
+                .content("BlogContent")
+                .title("Blog1")
+                .pictures(new ArrayList<>())
+                .build();
+        User user = User.builder()
+                .userId(1L)
+                .email("email@yahoo.com")
+                .password("12345")
+                .birthDate(LocalDate.of(2020, 10, 10))
+                .build();
+
+        MockMultipartFile images
+                = new MockMultipartFile(
+                "images",
+                "image.png",
+                MediaType.IMAGE_PNG_VALUE,
+                "Hello, World!".getBytes()
+        );
+
+        when(userService.getAuthenticatedUser()).thenReturn(user);
+        when(blogService.findById(blog.getBlogId())).thenReturn(blog);
+        when(blogService.save(blog)).thenReturn(blog);
+
+        mockMvc.perform(multipart("/blog/edit").file(images)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .flashAttr("blog", blog)
+                        .with(csrf()))
+                .andExpect(model().hasNoErrors())
+                .andExpect(redirectedUrl("/blog/" + blog.getBlogId()));
+
+    }
+
 }

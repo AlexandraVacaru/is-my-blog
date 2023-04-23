@@ -1,7 +1,9 @@
 package com.unibuc.ismyblog.controller;
 
+import com.unibuc.ismyblog.exception.InternalErrorException;
 import com.unibuc.ismyblog.model.Blog;
 import com.unibuc.ismyblog.model.CategoryEnum;
+import com.unibuc.ismyblog.model.User;
 import com.unibuc.ismyblog.service.BlogService;
 import com.unibuc.ismyblog.service.ImageService;
 import com.unibuc.ismyblog.service.UserService;
@@ -87,5 +89,48 @@ public class BlogController {
             return "redirect:/admin/blog/list?size=" + size.get() + "&page=" + page.get();
         }
         return "redirect:/blog/list";
+    }
+
+    @GetMapping("/blog/edit/{blogId}")
+    public ModelAndView editBlog(@PathVariable("blogId") Long blogId){
+        User authenticatedUser = userService.getAuthenticatedUser();
+        Blog blog = blogService.findById(blogId);
+        if(!authenticatedUser.equals(blog.getUser())) {
+            throw new InternalErrorException("Access denied");
+        }
+        ModelAndView modelAndView = new ModelAndView("edit-blog");
+        modelAndView.addObject("blog", blog);
+        return modelAndView;
+    }
+
+    @GetMapping("/blog/editPictures/{blogId}")
+    public ModelAndView editPictures(@PathVariable("blogId") Long blogId){
+        User authenticatedUser = userService.getAuthenticatedUser();
+        Blog blog = blogService.findById(blogId);
+        if(!authenticatedUser.equals(blog.getUser())) {
+            throw new InternalErrorException("Access denied");
+        }
+        ModelAndView modelAndView = new ModelAndView("picture-edit");
+        modelAndView.addObject("blog", blog);
+        return modelAndView;
+    }
+
+
+    @PostMapping("/blog/edit")
+    public String updateBlog(@ModelAttribute @Valid Blog blog,
+                             BindingResult bindingResult,
+                             @RequestParam("images") MultipartFile[] images) throws IOException {
+
+        if (bindingResult.hasErrors()) {
+            return "edit-blog";
+        }
+        Blog dbBlog = blogService.findById(blog.getBlogId());
+        blog.setUser(dbBlog.getUser());
+        blog.getPictures().addAll(dbBlog.getPictures());
+        blog.setDate(LocalDateTime.now());
+        Blog savedBlog = blogService.save(blog);
+        imageService.saveImageFile(savedBlog.getBlogId(), images);
+        log.info("Successfully edited blog with id {}", savedBlog.getBlogId());
+        return "redirect:/blog/" + blog.getBlogId();
     }
 }

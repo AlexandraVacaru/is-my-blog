@@ -7,6 +7,7 @@ import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
@@ -39,5 +40,11 @@ public class ImageController {
             }
         }
 
+    }
+
+    @RequestMapping("/blog/{blogId}/delete/{pictureId}")
+    public String deleteById(@PathVariable("blogId") Long blogId, @PathVariable("pictureId") Long pictureId){
+        imageService.deleteById(pictureId);
+        return "redirect:/blog/editPictures/" + blogId;
     }
 }
