@@ -12,7 +12,4 @@ import org.springframework.stereotype.Repository;
 public interface BlogRepository extends JpaRepository<Blog, Long> {
     @Query(nativeQuery = true, value = "SELECT * FROM blog WHERE LOWER(title) LIKE %:searchInput%")
     Page<Blog> findByTitle(@Param("searchInput") String searchInput, Pageable pageable);
-
-    @Query(nativeQuery = true, value = "SELECT COUNT(*) FROM user_like WHERE blog_id = :blogId")
-    Long getNoLikes(@Param("blogId") Long blogId);
 }

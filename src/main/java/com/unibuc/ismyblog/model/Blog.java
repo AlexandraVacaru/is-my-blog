@@ -1,6 +1,5 @@
 package com.unibuc.ismyblog.model;
 
-
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -10,7 +9,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "blog")
@@ -55,18 +55,15 @@ public class Blog {
     @ToString.Exclude
     private List<Comment> comments = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "likedBlogs", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @ToString.Exclude
-    private Set<User> usersLike = new LinkedHashSet<>();
-
     public String getFormattedDate() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return date.format(formatter);
     }
 
-    public void removeUser(User user) {
-        user.getLikedBlogs().remove(this);
-        usersLike.remove(user);
+    public String getFormattedContent() {
+        if (content.length() < 20) {
+            return content;
+        }
+        return content.substring(0, 20) + "...";
     }
-
 }

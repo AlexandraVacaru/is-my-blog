@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -41,25 +40,11 @@ public class BlogController {
                                   @RequestParam("size") Optional<Integer> size){
         int currentPage = page.orElse(1);
         int pageSize = size.orElse(4);
-        ModelAndView modelAndView = new ModelAndView("blogs");
+        ModelAndView modelAndView = new ModelAndView("welcome");
         Page<Blog> blogPage = blogService.findPaginated(PageRequest.of(currentPage - 1, pageSize));
         modelAndView.addObject("blogPage", blogPage);
+        modelAndView.addObject("authenticatedUser", userService.getAuthenticatedUser());
         modelAndView.addObject("lastPosted", blogService.findLastPosted());
-        modelAndView.addObject("blogSorted", false);
-        return modelAndView;
-    }
-
-    @GetMapping("/blog/list/sort")
-    public ModelAndView sortBlogs(@RequestParam("page") Optional<Integer> page,
-                                  @RequestParam("size") Optional<Integer> size,
-                                  @RequestParam("sortBy") Optional<String> sortBy){
-        int currentPage = page.orElse(1);
-        int pageSize = size.orElse(4);
-        ModelAndView modelAndView = new ModelAndView("blogs");
-        Page<Blog> blogPage = blogService.findPaginatedAndSorted(PageRequest.of(currentPage - 1, pageSize, Sort.by(sortBy.orElse(""))));
-        modelAndView.addObject("blogPage", blogPage);
-        modelAndView.addObject("lastPosted", blogService.findLastPosted());
-        modelAndView.addObject("blogSorted", true);
         return modelAndView;
     }
 
@@ -147,19 +132,5 @@ public class BlogController {
         return "redirect:/blog/list";
     }
 
-    @RequestMapping("/blog/search")
-    public String searchBlog(@RequestParam("searchInput") String searchInput,
-                             @RequestParam("page") Optional<Integer> page,
-                             @RequestParam("size") Optional<Integer> size,
-                             Model model) {
-
-        int currentPage = page.orElse(1);
-        int pageSize = size.orElse(4);
-        Page<Blog> blogPage = blogService.findByTitle(searchInput, PageRequest.of(currentPage -1, pageSize));
-        model.addAttribute("blogPage", blogPage);
-        model.addAttribute("searchInput", searchInput);
-        model.addAttribute("lastPosted", blogService.findLastPosted());
-        return "blogs";
-    }
 
 }

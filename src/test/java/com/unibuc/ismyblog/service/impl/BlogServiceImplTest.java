@@ -4,14 +4,16 @@ import com.unibuc.ismyblog.exception.NotFoundException;
 import com.unibuc.ismyblog.model.Blog;
 import com.unibuc.ismyblog.model.CategoryEnum;
 import com.unibuc.ismyblog.repository.BlogRepository;
-import com.unibuc.ismyblog.service.BlogService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +21,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class BlogServiceImplTest {
@@ -138,11 +139,14 @@ public class BlogServiceImplTest {
                 .build();
 
         List<Blog> blogs = List.of(blog1, blog2);
+        Page<Blog> blogPage = new PageImpl<>(blogs, PageRequest.of(1,
+                4), blogs.size());
 
-        when(blogRepository.findAll()).thenReturn(blogs);
+        when(blogRepository.findAll((Pageable) any())).thenReturn(blogPage);
 
-        Page<Blog> result = blogService.findPaginated(PageRequest.of(0, 4));
+        Page<Blog> result = blogService.findPaginated(PageRequest.of(1, 4));
         assertEquals(2, result.getNumberOfElements());
+        verify(blogRepository, times(1)).findAll((Pageable) any());
         assertEquals("Blog1", result.getContent().get(0).getTitle());
         assertEquals("Blog2", result.getContent().get(1).getTitle());
 

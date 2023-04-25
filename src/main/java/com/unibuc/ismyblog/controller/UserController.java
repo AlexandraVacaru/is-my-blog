@@ -1,6 +1,5 @@
 package com.unibuc.ismyblog.controller;
 
-import com.unibuc.ismyblog.exception.NotFoundException;
 import com.unibuc.ismyblog.model.Blog;
 import com.unibuc.ismyblog.model.Comment;
 import com.unibuc.ismyblog.model.ContactInfo;
@@ -13,7 +12,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
@@ -166,40 +168,4 @@ public class UserController {
         log.info("User {} added a new comment for blog {}", user.getUsername(), blog.getBlogId());
         return "redirect:/blog/" + blogId;
     }
-
-    @RequestMapping("like/{blogId}/user/{username}")
-    public String likeBlog(@PathVariable("blogId") Long blogId, @PathVariable("username") String username) {
-        Blog blog = blogService.findById(blogId);
-        User user = userService.findByUsername(username);
-
-        user.getLikedBlogs().add(blog);
-        userService.saveWithoutHash(user);
-        log.info("User {} liked blog with id {}", username, blogId);
-        return "redirect:/blog/" + blogId;
-
-    }
-
-    @RequestMapping("removeLike/{blogId}/user/{username}")
-    public String removeLikeBlog(@PathVariable("blogId") Long blogId, @PathVariable("username") String username) {
-        Blog blog = blogService.findById(blogId);
-        User user = userService.findByUsername(username);
-
-        if(blogService.isLiked(blogId, username)) {
-            user.getLikedBlogs().remove(blog);
-            userService.saveWithoutHash(user);
-        } else {
-            throw new NotFoundException("Like not found!");
-        }
-        log.info("User {} removed like from blog with id {}", username, blogId);
-        return "redirect:/blog/" + blogId;
-
-    }
-
-    @GetMapping("/user/{username}")
-    public ModelAndView getUserByUsername(@PathVariable("username") String username){
-        ModelAndView modelAndView = new ModelAndView("user-profile");
-        modelAndView.addObject("user", userService.findByUsername(username));
-        return modelAndView;
-    }
-
 }

@@ -2,19 +2,19 @@ package com.unibuc.ismyblog.service.impl;
 
 import com.unibuc.ismyblog.exception.NotFoundException;
 import com.unibuc.ismyblog.model.Blog;
-import com.unibuc.ismyblog.model.User;
 import com.unibuc.ismyblog.repository.BlogRepository;
 import com.unibuc.ismyblog.repository.UserRepository;
 import com.unibuc.ismyblog.service.BlogService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service("blogService")
@@ -39,24 +39,6 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public Page<Blog> findPaginated(Pageable pageable) {
-        List<Blog> blogs = findAll();
-        int pageSize = pageable.getPageSize();
-        int currentPage = pageable.getPageNumber();
-        int startItem = currentPage * pageSize;
-        List<Blog> list;
-        if (blogs.size() < startItem) {
-            list = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, blogs.size());
-            list = blogs.subList(startItem, toIndex);
-        }
-        Page<Blog> blogPage = new PageImpl<>(list, PageRequest.of(currentPage,
-                pageSize), blogs.size());
-        return blogPage;
-    }
-
-    @Override
-    public Page<Blog> findPaginatedAndSorted(Pageable pageable) {
         return blogRepository.findAll(pageable);
     }
 
@@ -79,14 +61,6 @@ public class BlogServiceImpl implements BlogService {
         }
 
         Blog blog = blogOptional.get();
-        Set<User> users = new LinkedHashSet<>();
-        if(blog.getUsersLike() != null) {
-            blog.getUsersLike().iterator().forEachRemaining(users::add);
-        }
-
-        for(User user : users) {
-            blog.removeUser(user);
-        }
         blogRepository.save(blog);
         blogRepository.deleteById(blogId);
         log.info("Successfully deleted blog with id {}", blogId);
@@ -106,21 +80,5 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public Page<Blog> findByTitle(String searchInput, Pageable pageable) {
         return blogRepository.findByTitle(searchInput, pageable);
-    }
-
-    @Override
-    public Boolean isLiked(Long blogId, String username) {
-        Blog blog = findById(blogId);
-        Optional<User> userOptional = userRepository.findByUsername(username);
-        if(userOptional.isEmpty()) {
-            throw new NotFoundException("User with username: " +  username + "not found");
-        }
-
-        return userOptional.get().getLikedBlogs().contains(blog);
-    }
-
-    @Override
-    public Long getNoLikes(Long blogId) {
-        return blogRepository.getNoLikes(blogId);
     }
 }

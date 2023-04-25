@@ -69,13 +69,6 @@ public class User {
     @ToString.Exclude
     private ContactInfo contactInfo;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "user_like",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "blog_id"))
-    @ToString.Exclude
-    private Set<Blog> likedBlogs;
-
     @OneToMany(mappedBy = "user")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ToString.Exclude
@@ -91,8 +84,4 @@ public class User {
         roles.remove(role);
     }
 
-    public void removeLikedBlog(Blog blog) {
-        blog.getUsersLike().remove(this);
-        likedBlogs.remove(blog);
-    }
 }
