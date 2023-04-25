@@ -201,7 +201,6 @@ public class BlogControllerTest {
                 4), blogs.size());
 
         when(blogService.findPaginated(any())).thenReturn(blogPage);
-        when(userService.getAuthenticatedUser()).thenReturn(user);
 
         mockMvc.perform(get("/blog/list"))
                 .andExpect(status().is2xxSuccessful())

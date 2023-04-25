@@ -31,7 +31,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/h2-console/login.do*").permitAll()
                 .antMatchers("/resources/**", "/static/**", "/css/**", "/js/**", "/images/**","/fonts/**",
-                        "/jquery/**", "/bootstrap/**", "/registration", "/index", "/").permitAll()
+                        "/jquery/**", "/bootstrap/**", "/registration", "/index", "/", "/blog/getImage/**", "/blog/list").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()

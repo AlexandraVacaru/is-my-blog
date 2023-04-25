@@ -131,7 +131,6 @@
                   <ul class="post-info" th:if="${blog.user} != null">
                     <li><a th:href="@{/user/{username}(username=${blog.user.username})}" style="color: #f48840" th:text="${blog.user.username}"></a></li>
                     <li><a th:text="${blog.getFormattedDate()}" href="#"></a></li>
-                    <li><a th:text="|${@blogService.getNoLikes(blog.blogId)} likes|" href="#"></a></li>
                   </ul>
                   <p th:text="${blog.content}"></p>
                   <div class="post-options">

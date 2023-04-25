@@ -43,7 +43,6 @@ public class BlogController {
         ModelAndView modelAndView = new ModelAndView("welcome");
         Page<Blog> blogPage = blogService.findPaginated(PageRequest.of(currentPage - 1, pageSize));
         modelAndView.addObject("blogPage", blogPage);
-        modelAndView.addObject("authenticatedUser", userService.getAuthenticatedUser());
         modelAndView.addObject("lastPosted", blogService.findLastPosted());
         return modelAndView;
     }
