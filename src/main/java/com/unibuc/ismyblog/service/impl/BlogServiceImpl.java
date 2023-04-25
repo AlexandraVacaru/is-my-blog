@@ -2,18 +2,20 @@ package com.unibuc.ismyblog.service.impl;
 
 import com.unibuc.ismyblog.exception.NotFoundException;
 import com.unibuc.ismyblog.model.Blog;
-import com.unibuc.ismyblog.model.User;
 import com.unibuc.ismyblog.repository.BlogRepository;
+import com.unibuc.ismyblog.repository.UserRepository;
 import com.unibuc.ismyblog.service.BlogService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service("blogService")
 @AllArgsConstructor
@@ -21,10 +23,23 @@ import java.util.*;
 public class BlogServiceImpl implements BlogService {
 
     private final BlogRepository blogRepository;
+    private final UserRepository userRepository;
+
+    @Override
+    public List<Blog> findAll() {
+        List<Blog> blogs = new LinkedList<>();
+        blogRepository.findAll().iterator().forEachRemaining(blogs::add);
+        return blogs;
+    }
 
     @Override
     public Blog save(Blog blog) {
         return blogRepository.save(blog);
+    }
+
+    @Override
+    public Page<Blog> findPaginated(Pageable pageable) {
+        return blogRepository.findAll(pageable);
     }
 
     @Override
@@ -39,35 +54,6 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    public Page<Blog> findPaginated(Pageable pageable) {
-        return blogRepository.findAll(pageable);
-    }
-
-    @Override
-    public List<Blog> findAll() {
-        List<Blog> blogs = new LinkedList<>();
-        blogRepository.findAll().iterator().forEachRemaining(blogs::add);
-        return blogs;
-    }
-    @Override
-    public Page<Blog> findPaginatedWelcome(Pageable pageable) {
-        List<Blog> blogs = findAll();
-        int pageSize = pageable.getPageSize();
-        int currentPage = pageable.getPageNumber();
-        int startItem = currentPage * pageSize;
-        List<Blog> list;
-        if (blogs.size() < startItem) {
-            list = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, blogs.size());
-            list = blogs.subList(startItem, toIndex);
-        }
-        Page<Blog> blogPage = new PageImpl<>(list, PageRequest.of(currentPage,
-                pageSize), blogs.size());
-        return blogPage;
-    }
-
-    @Override
     public void deleteById(Long blogId) {
         Optional<Blog> blogOptional = blogRepository.findById(blogId);
         if(blogOptional.isEmpty()) {
@@ -75,10 +61,24 @@ public class BlogServiceImpl implements BlogService {
         }
 
         Blog blog = blogOptional.get();
-        Set<User> users = new LinkedHashSet<>();
-
         blogRepository.save(blog);
         blogRepository.deleteById(blogId);
         log.info("Successfully deleted blog with id {}", blogId);
+    }
+
+    @Override
+    public List<Blog> findLastPosted() {
+        List<Blog> allBlogsSorted = findAll().stream()
+                .sorted(Comparator.comparing(Blog::getDate))
+                .collect(Collectors.toList());
+        if (allBlogsSorted.size() >= 3 ) {
+            return allBlogsSorted.subList(0,3);
+        }
+        return allBlogsSorted;
+    }
+
+    @Override
+    public Page<Blog> findByTitle(String searchInput, Pageable pageable) {
+        return blogRepository.findByTitle(searchInput, pageable);
     }
 }

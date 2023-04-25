@@ -1,10 +1,10 @@
 package com.unibuc.ismyblog.controller;
 
+import com.unibuc.ismyblog.model.Blog;
+import com.unibuc.ismyblog.model.Comment;
 import com.unibuc.ismyblog.model.ContactInfo;
 import com.unibuc.ismyblog.model.User;
-import com.unibuc.ismyblog.service.ContactInfoService;
-import com.unibuc.ismyblog.service.SecurityService;
-import com.unibuc.ismyblog.service.UserService;
+import com.unibuc.ismyblog.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -20,6 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Controller
@@ -33,6 +34,12 @@ public class UserController {
 
     @Autowired
     private ContactInfoService contactInfoService;
+
+    @Autowired
+    private CommentService commentService;
+
+    @Autowired
+    private BlogService blogService;
 
     @GetMapping("/registration")
     public String registration(Model model) {
@@ -138,4 +145,27 @@ public class UserController {
         return "login";
     }
 
+    @PostMapping("comment/{blogId}/user/{username}")
+    public String addComment(@ModelAttribute("comment") @Valid Comment comment,
+                             BindingResult bindingResult,
+                             @PathVariable("blogId") Long blogId,
+                             @PathVariable("username") String username,
+                             Model model) {
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("blog", blogService.findById(blogId));
+            model.addAttribute("lastPosted", blogService.findLastPosted());
+            return "blog";
+        }
+
+        Blog blog = blogService.findById(blogId);
+        User user = userService.findByUsername(username);
+
+        comment.setBlog(blog);
+        comment.setUser(user);
+        comment.setDate(LocalDateTime.now());
+        commentService.save(comment);
+        log.info("User {} added a new comment for blog {}", user.getUsername(), blog.getBlogId());
+        return "redirect:/blog/" + blogId;
+    }
 }

@@ -3,6 +3,7 @@ package com.unibuc.ismyblog.controller;
 import com.unibuc.ismyblog.exception.InternalErrorException;
 import com.unibuc.ismyblog.model.Blog;
 import com.unibuc.ismyblog.model.CategoryEnum;
+import com.unibuc.ismyblog.model.Comment;
 import com.unibuc.ismyblog.model.User;
 import com.unibuc.ismyblog.service.BlogService;
 import com.unibuc.ismyblog.service.ImageService;
@@ -34,6 +35,27 @@ public class BlogController {
     private final ImageService imageService;
     private final UserService userService;
 
+    @GetMapping({"/", "/index", "/blog/list"})
+    public ModelAndView blogsList(@RequestParam("page") Optional<Integer> page,
+                                  @RequestParam("size") Optional<Integer> size){
+        int currentPage = page.orElse(1);
+        int pageSize = size.orElse(4);
+        ModelAndView modelAndView = new ModelAndView("welcome");
+        Page<Blog> blogPage = blogService.findPaginated(PageRequest.of(currentPage - 1, pageSize));
+        modelAndView.addObject("blogPage", blogPage);
+        modelAndView.addObject("authenticatedUser", userService.getAuthenticatedUser());
+        modelAndView.addObject("lastPosted", blogService.findLastPosted());
+        return modelAndView;
+    }
+
+    @GetMapping("/blog/{blogId}")
+    public String showById(@PathVariable("blogId") Long blogId, Model model){
+        model.addAttribute("blog", blogService.findById(blogId));
+        model.addAttribute("lastPosted", blogService.findLastPosted());
+        model.addAttribute("comment", new Comment());
+        return "blog";
+    }
+
     @GetMapping("/blog/new")
     public String newBlog(Model model) {
         model.addAttribute("blog", new Blog());
@@ -56,39 +78,6 @@ public class BlogController {
         log.info("Successfully added blog with id {} by user {}", savedBlog.getBlogId(),
                 savedBlog.getUser().getUsername());
         return "redirect:/blog/list" ;
-    }
-
-    @GetMapping("/blog/{blogId}")
-    public String showById(@PathVariable("blogId") Long blogId, Model model){
-        model.addAttribute("blog", blogService.findById(blogId));
-        return "blog";
-    }
-
-    @GetMapping({"/", "/index", "/blog/list"})
-    public ModelAndView blogsList(@RequestParam("page") Optional<Integer> page,
-                                  @RequestParam("size") Optional<Integer> size){
-        int currentPage = page.orElse(1);
-        int pageSize = size.orElse(4);
-        ModelAndView modelAndView = new ModelAndView("welcome");
-        modelAndView.addObject("authenticatedUser", userService.getAuthenticatedUser());
-        Page<Blog> blogPage = blogService.findPaginatedWelcome(PageRequest.of(currentPage - 1, pageSize));
-        modelAndView.addObject("blogPage", blogPage);
-        modelAndView.addObject("blogSorted", false);
-        return modelAndView;
-    }
-
-    @PreAuthorize("#username == authentication.principal.username or hasRole('ROLE_ADMIN')")
-    @RequestMapping("/blog/delete/{blogId}")
-    public String deleteById(@PathVariable("blogId") Long blogId,
-                             @RequestParam("username") String username,
-                             @RequestParam("page") Optional<Integer> page,
-                             @RequestParam("size") Optional<Integer> size){
-        blogService.deleteById(blogId);
-        log.info("User {} successfully deleted blog with id {}", username, blogId);
-        if (size.isPresent() && page.isPresent()) {
-            return "redirect:/admin/blog/list?size=" + size.get() + "&page=" + page.get();
-        }
-        return "redirect:/blog/list";
     }
 
     @GetMapping("/blog/edit/{blogId}")
@@ -133,4 +122,15 @@ public class BlogController {
         log.info("Successfully edited blog with id {}", savedBlog.getBlogId());
         return "redirect:/blog/" + blog.getBlogId();
     }
+
+    @PreAuthorize("#username == authentication.principal.username or hasRole('ROLE_ADMIN')")
+    @RequestMapping("/blog/delete/{blogId}")
+    public String deleteById(@PathVariable("blogId") Long blogId,
+                             @RequestParam("username") String username){
+        blogService.deleteById(blogId);
+        log.info("User {} successfully deleted blog with id {}", username, blogId);
+        return "redirect:/blog/list";
+    }
+
+
 }

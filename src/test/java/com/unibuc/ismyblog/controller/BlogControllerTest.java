@@ -32,7 +32,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -201,7 +200,7 @@ public class BlogControllerTest {
         Page<Blog> blogPage = new PageImpl<>(blogs, PageRequest.of(1,
                 4), blogs.size());
 
-        when(blogService.findPaginatedWelcome(any())).thenReturn(blogPage);
+        when(blogService.findPaginated(any())).thenReturn(blogPage);
         when(userService.getAuthenticatedUser()).thenReturn(user);
 
         mockMvc.perform(get("/blog/list"))
